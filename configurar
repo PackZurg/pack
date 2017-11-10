@@ -1,0 +1,302 @@
+#!/bin/bash 
+# Autor: @Fs0usa
+# Data de criação/update: 24/04/17
+# Objetivo:
+# Descrição: 
+# Projeto: Fechado
+# Utiluze por sua conta e risco, não modifique o script com o intuito
+# de ganhar em cima de tal.
+
+# Tabelas de cores que eu utilizo.
+fim="tput sgr0"
+bold="tput bold"
+vermelho="tput setaf 1"
+verde="tput setaf 2"
+amarelo="tput setaf 3"
+azul="tput setaf 4"
+roxo="tput setaf 5"
+ciano="tput setaf 6"
+branco="tput setaf 7"
+limpa="tput setaf 9"
+# Inicio do script
+
+# Funcoes
+
+msg() {
+$vermelho; $bold;
+echo "
+Aguarde um pouco..."; $fim 
+}
+msg_end() {
+clear
+$amarelo ; $bold 
+echo "                         Procedimentos completos"; $fim
+
+$ciano ; $bold
+echo "
+Utilize o IP da SSH: $IP
+Nas portas: 
+			22     (SSH)
+			443    (Dropbear)
+  		  	80     (SQUID/PROXY)
+			8080   (SQUID/PROXY)
+			8799   (SQUID/PROXY)
+			3128   (SQUID/PROXY)"; $fim
+
+$amarelo; $bold
+echo "Pressione qualquer tecla para sair" ; $fim
+read -n1 enter
+cd /
+exit
+MENU
+} 
+
+open_ssh() {
+echo " "
+$branco; $bold; echo "Configurando..."; $fim
+cd /etc/ssh
+mv sshd_config sshd_config.old
+echo "Port 22" >> sshd_config 
+echo "Port 443" >> sshd_config
+echo "Protocol 2" >> sshd_config
+echo "PermitRootLogin yes" >> sshd_config
+echo "PermitEmptyPasswords yes" >> sshd_config
+echo "PasswordAuthentication yes" >> sshd_config
+echo "TCPKeepAlive yes"  >> sshd_config
+echo "UseDNS yes" >> sshd_config
+echo "Subsystem sftp /usr/lib/openssh/sftp-server" >> sshd_config
+echo "Banner /etc/ssh/banner.txt" >> sshd_config
+service ssh restart > /dev/null
+echo " "
+$verde; $bold; echo "Finalizado."; $fim
+}
+drop_config() {
+$branco; $bold; echo "Configurando..."; $fim
+echo " "
+rm /etc/default/dropbear
+apt-get --purge remove dropbear* -y 1> /dev/null 2> /dev/null
+# update
+apt-get update
+# instala o dropbear
+apt-get install dropbear -y
+# Arquivo de configuração do dropbear
+# Que ativa as portas
+ 
+echo '
+# disabled because OpenSSH is installed
+# change to NO_START=0 to enable Dropbear
+NO_START=0
+# the TCP port that Dropbear listens on
+DROPBEAR_PORT=443
+# any additional arguments for Dropbear
+DROPBEAR_EXTRA_ARGS=$1
+# specify an optional banner file containing a message to be
+# sent to clients before they connect, such as "/etc/issue.net"
+DROPBEAR_BANNER=""
+# RSA hostkey file (default: /etc/dropbear/dropbear_rsa_host_key)
+#DROPBEAR_RSAKEY="/etc/dropbear/dropbear_rsa_host_key"
+# DSS hostkey file (default: /etc/dropbear/dropbear_dss_host_key)
+#DROPBEAR_DSSKEY="/etc/dropbear/dropbear_dss_host_key"
+# Receive window size - this is a tradeoff between memory and
+# network performance
+DROPBEAR_RECEIVE_WINDOW=65536' > /etc/default/dropbear
+# inicia o serviço dropbear
+service dropbear restart
+# update
+update-rc.d dropbear defaults
+# Criar chave RSA { segura e simples }
+dropbearkey -t rsa -f /etc/dropbear_rsa_host_key
+clear
+echo " "
+$verde; $bold; echo "Finalizado."; $fim
+}
+squid3_conf() {
+apt-get update 1> /dev/null 	
+apt-get install squid3 -y 1> /dev/null 
+cd /etc/squid3
+mv squid.conf squid.conf.old
+touch squid.conf
+echo "acl localhost src 127.0.0.1/255.255.255.255" >> squid.conf
+echo "acl url1 url_regex -i $IP" >> squid.conf
+echo "acl url2 dstdomain .claro.com.br" >> squid.conf
+echo "acl url3 dstdomain .claro.com" >> squid.conf
+echo "acl url4 dstdomain .net" >> squid.conf
+echo "acl url5 dstdomain .com.br" >> squid.conf
+echo "http_access allow localhost" >> squid.conf
+echo "http_access allow url1" >> squid.conf
+echo "http_access allow url2" >> squid.conf
+echo "http_access allow url3" >> squid.conf
+echo "http_access allow url4" >> squid.conf
+echo "http_access allow url5" >> squid.conf
+echo "http_access deny all" >> squid.conf
+echo "http_port 80" >> squid.conf
+echo "http_port 8080" >> squid.conf 
+echo "http_port 8799" >> squid.conf
+echo "http_port 3128" >> squid.conf
+echo "visible_hostname @Fs0usa" >> squid.conf
+clear
+$vermelho; $bold
+echo "Aguarde um pouco..."; $fim 
+service ssh restart 1> /dev/null 2> /dev/null
+service squid3 restart 1> /dev/null 2> /dev/null
+service squid3 reload 1> /dev/null 2> /dev/null
+}
+
+squid_conf() {
+
+apt-get update 1> /dev/null	
+apt-get install squid -y 1> /dev/null 
+clear	
+cd /etc/squid
+mv squid.conf squid.conf.old
+touch squid.conf
+echo "acl localhost src 127.0.0.1/255.255.255.255" >> squid.conf
+echo "acl url1 url_regex -i $IP" >> squid.conf
+echo "acl url2 dstdomain .claro.com.br" >> squid.conf
+echo "acl url3 dstdomain .claro.com.sv" >> squid.conf
+echo "acl url4 dstdomain .net" >> squid.conf
+echo "acl url5 dstdomain .com.br" >> squid.conf
+echo "http_access allow localhost" >> squid.conf
+echo "http_access allow url1" >> squid.conf
+echo "http_access allow url2" >> squid.conf
+echo "http_access allow url3" >> squid.conf
+echo "http_access allow url4" >> squid.conf
+echo "http_access allow url5" >> squid.conf
+echo "http_access deny all" >> squid.conf
+echo "http_port 80" >> squid.conf
+echo "http_port 8080" >> squid.conf 
+echo "http_port 8799" >> squid.conf
+echo "http_port 3128" >> squid.conf
+echo "visible_hostname @Fs0usa" >> squid.conf
+clear
+$vermelho ; $bold ; echo "
+Aguarde um pouco..." ; $fim 
+service ssh restart 1> /dev/null 
+service squid restart 1> /dev/null 
+service ssh reload 1> /dev/null 
+service squid reload 1> /dev/null
+}
+
+# Hostname da máquina
+nonename=`uname -n`
+
+# menu, main
+MENU() {
+clear
+$vermelho; $bold; echo "Version release 3.2"
+# Mensagem  
+$amarelo; $bold; echo "Bem vindo(a) $nonename"; $branco; $bold 
+echo -e "\nDeseja Instalar pacotes necessários para a administração? [yes/no]\n\t\t\thtop : bmon : top : ifping\n"
+read -p ":: " -e -i no RESP
+
+case $RESP in
+	"yes"|"y")
+		clear
+		$verde; $bold; echo -e "\nAguarde um pouco...\n"; $branco; $bold
+		apt-get install -y bmon &> /dev/null
+		apt-get install -y htop &> /dev/null 	
+		apt-get install -y top &> /dev/null 	
+		apt-get install -y ifping &> /dev/null	
+		clear
+	;;
+
+	"no"|"n")
+		$branco; $bold
+	;;
+	*)
+		echo -e "Responda apenas yes ou no!"; $fim
+		exit 2
+	;;
+
+esac
+echo " "
+$ciano; $bold
+read -p "Deseja usar Dropbear na configuração [Y/n]: " -e -i Y drop
+case $drop in
+y|Y)
+padron='"-p 443"'
+$branco; $bold
+echo "Aviso: Caso queira adicionar uma porta, coloque '-p' + a porta + aspa [se achou ruim, pau no seu cu]"
+echo " "
+read -p "Quais portas usar no dropbear: " -e -i "$padron" portas
+echo " "
+drop_config "$portas" ;;
+n|N) open_ssh ;;
+*) opcao_desconhecida ;;
+esac
+echo " "
+IP=$(wget -qO- ipv4.icanhazip.com)
+read -p "IP: " -e -i $IP IP
+
+# identificando distro da máquina.
+DIS1=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep DISTRIB_DESCRIPTION`
+DIS2=`echo ${DIS1#DISTRIB_DESCRIPTION=}`
+DIS3=`echo ${DIS2%%.*} | sed 's/"//'`
+
+distro=""
+
+if [[ "$DIS3" = "Ubuntu 14" ]]
+then
+    distro="2"
+fi
+ 
+if [[ "$DIS3" = "Ubuntu 16" ]]
+then
+    distro="3"
+fi
+ 
+if [ -z "$DIS1" ]
+then
+   DIS1=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep PRETTY_NAME=`
+   DIS2=`echo ${DIS1#PRETTY_NAME=}`
+   DIS3=`echo $DIS3 | sed 's/"//' | awk '{print $1}'`
+   distro="1"
+fi
+
+$verde; $bold; echo -e "\nDigite o número de sua distro[]: \n"; $amarelo; $bold
+echo -e "
+[ 1 ] Debian ( 7 ou 8 )
+[ 2 ] Ubuntu ( 14 )
+[ 3 ] Ubuntu ( 16 )\n"; $ciano; $bold
+read -p "Número correspondente: " -e -i $distro distro
+$fim
+case $distro in 
+1) deb ;;
+2) ubuntu14 ;;
+3) ubuntu16 ;; 
+*) opcao_desconhecida ;;
+esac 
+}
+
+deb() {
+msg
+squid3_conf
+msg_end
+} 
+
+ubuntu14() {
+msg
+squid3_conf
+clear
+$vermelho; $bold
+echo "Aguarde um pouco..."; $fim 
+service ssh restart 1> /dev/null 2> /dev/stdout
+service squid3 restart 1> /dev/null 2> /dev/stdout
+msg_end
+} 
+
+ubuntu16() {
+msg
+squid_conf 
+msg_end
+}
+
+opcao_desconhecida() {
+clear
+$vermelho ; $bold
+echo "Opção escolhida inválida, digite apenas o correspondente"
+echo "Que esteja nas opções a seguir" ; $fim
+sleep 1
+MENU
+}
+MENU

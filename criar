@@ -1,0 +1,98 @@
+#!/bin/bash 
+# Autor: @Fs0usa
+# Data de criação/update: 29/10/17
+# Objetivo:
+# Descrição: 
+# Projeto: Fechado
+# Utilize por sua conta e risco, não modifique o script com o intuito
+# de ganhar em cima de tal.
+
+# Tabelas de cores que eu utilizo.
+fim="tput sgr0"
+bold="tput bold"
+vermelho="tput setaf 1"
+verde="tput setaf 2"
+amarelo="tput setaf 3"
+azul="tput setaf 4"
+roxo="tput setaf 5"
+ciano="tput setaf 6"
+branco="tput setaf 7"
+limpa="tput setaf 9"
+# Inicio do script
+
+# Funcoes
+verify() {
+awk -F":" '{print $1}' /etc/passwd > /bin/users.txt
+	if grep -Fxq $usuario /bin/users.txt
+    then
+    	$vermelho; $bold; echo -e "\nO usuário $1 já  existe,  por favor digite um usuário que não exista a seguir.\n"; $branco; $bold
+    	read -p ":: "  usuario
+   
+		if grep -Fxq $usuario /bin/users.txt
+        then
+        	$vermelho; $bold; echo -e "\nVocê  digitou um nome de usuário existente duas vezes.\n"; $fim
+		exit 2
+    	fi
+	fi
+}
+add() {
+useradd $1 && echo $1:$2 | chpasswd
+passwd -x $3 $1
+}
+verify_two() {
+awk -F":" '{print $1}' /etc/passwd > /bin/users.txt
+	if grep -Fxq $usuario /bin/users.txt
+    then
+    	$verde; $bold; echo -e "\nO usuário $1 foi criado com sucesso!!!\n"; $branco; $bold
+
+    	$branco; $bold; read -p "Deseja impor limite de conexões simultâneas[Y/n]: " resp
+    	case $resp in 
+			"Y"|"y") 
+				$branco; $bold; read -p "[Qual tipo de limite? ( 1=Deleta 2=Queima_PID )]: " tipo_do_limite
+$fim
+				$branco; $bold; read -p "[Qual o n° de conexoes simultâneas permitidas?]: " limite
+					if (echo "$limite" | egrep "[^0-9]" 2> /dev/null)
+					then
+						clear
+						echo -e "$vermelho Número inválido"; $fim
+						exit
+					fi
+				case $tipo_do_limite in
+					1)
+						clear
+						echo $1$limite:$tipo_do_limite >> /bin/logs.pack/usuarios.pack.db
+						$verde; $bold; echo "Concluido, o limite foi associado." ; $fim ;;
+					2)
+						clear
+						echo $1$limite:$tipo_do_limite >> /bin/logs.pack/usuarios.pack.db
+						$verde; $bold; echo "Concluido, o limite foi associado." ; $fim ;;
+					*)
+						clear
+						$vermelho; $bold; echo "Responda apenas 1 ou 2"
+						$fim ;;
+					esac
+			;;
+			"N"|"n")
+				
+			;;
+			*) exit ;;
+		esac
+	fi
+}
+#
+user=`uname -n`
+clear
+$branco; $bold; echo -e "Bem vindo(a) $user - V.01\n\n"; $fim
+read -p "Deseja criar um usuário normal[Y/n]: " condition
+case $condition in
+y|Y) 
+echo " "
+read -p "Nome do usuário: " usuario
+verify "$usuario"
+read -p "Senha: " senha
+read -p "Dias válido: " dias
+add "$usuario" "$senha" "$dias"
+verify_two "$usuario" 
+;;
+n|N) exit ;;
+esac

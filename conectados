@@ -1,0 +1,46 @@
+#!/bin/bash 
+# Autor: @Fs0usa
+# Data de criação/update:  8/10/17
+# Objetivo: 
+# Descrição: none
+# Projeto: Fechado
+# Utilize por sua conta e risco, não modifique o script com o intuito
+# de ganhar em cima de tal.
+
+# Tabelas de cores que eu utilizo.
+fim="tput sgr0"
+bold="tput bold"
+vermelho="tput setaf 1"
+verde="tput setaf 2"
+amarelo="tput setaf 3"
+azul="tput setaf 4"
+roxo="tput setaf 5"
+ciano="tput setaf 6"
+branco="tput setaf 7"
+limpa="tput setaf 9"
+brilho="tput setab 7"
+# Inicio do script
+
+while true
+do
+	clear
+	$vermelho; $bold
+	echo "Para sair pressione 'q'"; $fim; $branco; $bold
+	echo "--------------------------------------------------------"; $fim; $azul; $brilho
+	echo "              Usuários    |    Conectados               "; $fim; $branco; $bold
+	echo "--------------------------------------------------------"; $fim
+	for usuarios in `awk -F":" '{if($3>=1000 ) print $1}' /etc/passwd | grep -v "nobody"`
+	do
+	conexoes=$(ps -u $usuarios | grep ssh* | wc -l)
+	all=`echo $usuarios $conexoes`
+	$ciano; $bold
+	printf '  %-33s%s\n' $all  ; $fim
+	echo "--------------------------------------------------------"
+	done
+	
+read -t5 -n1 resp
+if [ "$resp" = "q" ]
+then
+exit
+fi
+done
