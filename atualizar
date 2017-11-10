@@ -1,0 +1,71 @@
+#!/bin/bash 
+# Autor: @Fs0usa
+# Data de criação/update: 24/04/17
+# Objetivo:
+# Descrição: 
+# Projeto: Fechado
+# Utiluze por sua conta e risco, não modifique o script com o intuito
+# de ganhar em cima de tal.
+
+# Tabelas de cores que eu utilizo.
+fim="tput sgr0"
+bold="tput bold"
+vermelho="tput setaf 1"
+verde="tput setaf 2"
+amarelo="tput setaf 3"
+azul="tput setaf 4"
+roxo="tput setaf 5"
+ciano="tput setaf 6"
+branco="tput setaf 7"
+limpa="tput setaf 9"
+azul2="\e[1;34m"
+ciano2="\e[1;36m"
+# Inicio do script
+
+se_o_progama_existe() {
+git=$(dpkg --get-selections | grep "git" )
+dos2unix=$(dpkg --get-selections | grep "dos2unix" )
+
+	if [ -n "$git" ]; then
+		echo -e "\nGIT [OK]\n"
+	else
+		apt-get update >/dev/null
+		apt-get install git -y > /dev/null
+		echo -e "GIT [OK]\n"
+	fi
+	
+	if [ -n "$dos2unix" ]; then
+		echo -e "\ndos2unix [OK]\n"
+	else
+		apt-get install dos2unix > /dev/null
+		echo -e "dos2unix [OK]\n"
+	fi
+}
+
+$branco; $bold; echo "Aguarde"
+
+	se_o_progama_existe
+	
+rm -rf /bin/pack
+rm -rf pack 
+rm atualizar
+
+	git clone https://github.com/PackZurg/pack.git
+
+cd pack
+
+	for i in `ls`
+	do
+		rm /bin/$i &> /dev/null
+		mv $i /bin 
+		chmod +x /bin/$i
+		dos2unix /bin/$i
+		clear
+	done
+
+mkdir /bin/logs.pack
+touch /bin/logs.pack/usuarios.pack.db
+wget https://raw.githubusercontent.com/PackZurg/limitador/master/instalador && chmod 777 instalador && dos2unix instalador && bash instalador
+nohup limitador &
+
+echo -e "$ciano2 Tudo pronto, digite $azul2 menu $ciano2 para listar os comandos."; $fim
