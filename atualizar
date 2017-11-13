@@ -63,9 +63,9 @@ cd pack
 		clear
 	done
 
+apt-get install screen
 mkdir /bin/logs.pack
 touch /bin/logs.pack/usuarios.pack.db
-wget https://raw.githubusercontent.com/PackZurg/limitador/master/instalador && chmod 777 instalador && dos2unix instalador && bash instalador
-nohup limitador &
+wget https://raw.githubusercontent.com/PackZurg/limitador/master/instalador && chmod 777 instalador && dos2unix instalador && bash instalador && screen limitador 
 
 echo -e "$ciano2 Tudo pronto, digite $azul2 menu $ciano2 para listar os comandos."; $fim
