@@ -64,14 +64,12 @@ cd pack
 	done
 
 apt-get install screen
-apt-get install zenity -y &> /dev/null
+apt-get install dialog -y 1> /dev/null
 mkdir /bin/logs.pack
 touch /bin/logs.pack/usuarios.pack.db
-wget https://raw.githubusercontent.com/PackZurg/limitador/master/instalador && chmod 777 instalador && dos2unix instalador && bash instalador && s
 
-zenity –info \
-–text="Após esta mensagem, pressione ctrl +a+d"
+dialog --title “Ctrl + a + d” --msgbox “Após a instalação, a tela irá ficar em um loop screen, basta pressionar ctrl+a+d” 0 0
 
-screen -d -t limitador
+wget https://raw.githubusercontent.com/PackZurg/limitador/master/instalador && chmod 777 instalador && dos2unix instalador && bash instalador && screen -d -t limitador
 
 echo -e "$ciano2 Tudo pronto, digite $azul2 menu $ciano2 para listar os comandos."; $fim
