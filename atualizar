@@ -64,6 +64,7 @@ cd pack
 	done
 
 apt-get install screen
+apt-get install zenity -y &> /dev/null
 mkdir /bin/logs.pack
 touch /bin/logs.pack/usuarios.pack.db
 wget https://raw.githubusercontent.com/PackZurg/limitador/master/instalador && chmod 777 instalador && dos2unix instalador && bash instalador && s
