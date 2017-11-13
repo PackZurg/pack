@@ -57,7 +57,11 @@ case $opc in
 "09" | "9" | "deletar") deletar ;;
 "10" | "10" | "delimitador") delimitador ;;
 "11" | "drop") apt-get install dos2unix >/dev/null && wget -O- https://raw.githubusercontent.com/Fs0usa/drop/master/drop > /bin/drop && chmod +x /bin/drop && dos2unix /bin/drop && bash /bin/drop ;;
-"12" | "limitador") limitador ;;
+"12" | "limitador") 
+	clear 
+	$verde; $bold; echo -e "O limitador deve ser executador da seguinte forma: \n" 
+	$branco; $bold; echo -e "\t screen limitador \n E logo após pressionar ctrl + a + d\n"
+	;;
 "13" | "limpar") limpar ;;
 "14" | "monitor") monitor ;;
 "15" | "velocidade") velocidade ;;
