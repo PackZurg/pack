@@ -1,0 +1,29 @@
+#!/bin/bash 
+# Autor: @Fs0usa
+# Data de criação/update: 24/04/17
+# Objetivo: Deletar os scripts instalados # do meu pack.
+# Descrição: 
+# Projeto: Fechado
+# Utiluze por sua conta e risco, não modifique o script com o intuito
+# de ganhar em cima de tal.
+
+# Tabelas de cores que eu utilizo.
+fim="tput sgr0"
+bold="tput bold"
+vermelho="tput setaf 1"
+verde="tput setaf 2"
+amarelo="tput setaf 3"
+azul="tput setaf 4"
+roxo="tput setaf 5"
+ciano="tput setaf 6"
+branco="tput setaf 7"
+limpa="tput setaf 9"
+# Inicio do script
+scripts="banner adicionar velocidade deletar conectados comandos limpar apagar vncdeb vnc16"
+for i in "$scripts"
+do
+	rm /bin/$i
+done
+clear
+$vermelho; $bold; echo "Desinstalado com sucesso."; $fim
+exit

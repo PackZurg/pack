@@ -1,0 +1,97 @@
+#!/bin/bash 
+# Autor: @Fs0usa
+# Data de criação/update: 18/04/17
+# Objetivo: Deleter um usuario ativo na vps.
+# Descrição: 
+# Projeto: Fechado
+# Utiluze por sua conta e risco, não modifique o script com o intuito
+# de ganhar em cima de tal.
+
+# Tabelas de cores que eu utilizo.
+fim="tput sgr0"
+bold="tput bold"
+vermelho="tput setaf 1"
+verde="tput setaf 2"
+amarelo="tput setaf 3"
+azul="tput setaf 4"
+roxo="tput setaf 5"
+ciano="tput setaf 6"
+branco="tput setaf 7"
+limpa="tput setaf 9"
+# Inicio do script
+
+mkdir /bin/logs.pack
+usuarios=`awk -F":" '{if($3>=1000 ) print $1}' /etc/passwd | grep -v "nobody"`
+hostname=`uname -n`
+clear
+verifique() {
+existentes=`awk -F"x" '{print $1}' /etc/passwd | grep "$usuario:"`
+usuario_existente="$usuario:"
+if [ "$existentes" = "$usuario_existente" ]; then
+	$branco; $bold; echo "Ok"
+	else
+    $vermelho; $bold
+	echo "O usuário $usuario não  existe,  por favor digite um usuário que exista a seguir."
+    read -p ":: " usuario
+	    
+		existentes=`awk -F"x" '{print $1}' /etc/passwd | grep "$usuario"`
+		if [ "$existentes" = "$usuario_existente" ]; then
+		$branco; $bold; echo "Ok"
+		else
+  	  $vermelho; $bold
+		echo "O usuário $usuario não  existe,  por favor digite um usuário que exista a seguir."
+   	 read -p ":: " usuario
+				existentes=`awk -F"x" '{print $1}' /etc/passwd | grep "$usuario"`
+				if [ "$existentes" = "$usuario_existente" ]; then
+				$branco; $bold; echo "Ok"
+				else
+                clear
+			    $vermelho; $bold; echo "Saindo."; $fim
+				exit
+				fi
+		fi
+fi 
+}
+
+$branco; $bold; echo -e "Bem vindo $hostname"
+echo -e "\nUsuário(s) existente(s):"; $fim; $ciano; $bold
+echo -e "\n$usuarios\n"; $branco; $bold
+
+read -p "Qual usuário deseja deletar: " usuario
+verifique
+$branco; $bold
+echo "
+Deseja realmente fazer isso? [s/n] "
+read -p ":: " -e -i s sn
+case $sn in
+"s"| "S")
+$vermelho; $bold 
+echo "
+Aguarde..." 
+echo $usuario:nova_senha | chpasswd
+	for user_kill in `ps -u $usuario | grep ssh* | awk '{print $1}'`
+	do
+	kill $user_kill
+	done
+echo "Usuário $usuario foi excluido" >> /bin/logs.pack/usuarios.pack.excluidos.db
+service squid3 restart &>/dev/null
+service squid restart &>/dev/null
+$vermelho; $bold; echo "Deletando Usuário..."; $fim
+userdel $usuario
+$verde; $bold; echo "Tudo Pronto..."; $amarelo; $bold 
+echo -e "\nPressione qualquer tecla para sair"; $fim
+read -s -n1 qlqTcl
+exit
+;;
+
+"n" | "N")
+clear
+$branco; $bold
+exit
+;;
+
+*)
+clear
+$vermelho; $bold; echo "Responda apenas s ou n"; $fim
+;;
+esac

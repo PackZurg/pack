@@ -1,0 +1,90 @@
+#!/bin/bash 
+# Autor: @Fs0usa
+# Data de criação/update:  24/04/17
+# Objetivo: Adicionar usuários a maquina linux sem acesso ao shell
+# Descrição: none
+# Projeto: Fechado
+# Utiluze por sua conta e risco, não modifique o script com o intuito
+# de ganhar em cima de tal.
+
+# Tabelas de cores que eu utilizo.
+fim="tput sgr0"
+bold="tput bold"
+vermelho="tput setaf 1"
+verde="tput setaf 2"
+amarelo="tput setaf 3"
+azul="tput setaf 4"
+roxo="tput setaf 5"
+ciano="tput setaf 6"
+branco="tput setaf 7"
+limpa="tput setaf 9"
+# Inicio do script
+
+clear
+# usuários existentes.
+usuarios_existentes=`awk -F":" '{if($3>=1000 ) print $1}' /etc/passwd | grep -v "nobody"`
+
+$vermelho; $bold
+echo -e "O usuário  criado não terá acesso ao terminal.\n\n"; $verde; $bold
+echo -e "Nome do's usuário's existente's:\n"; $ciano; $bold
+echo -e "$usuarios_existentes\n"; $fim; $branco; $bold
+
+	read -p "Qual o nome do usuário[]: " usuario
+		if [ -z "$usuario" ]; then
+			$vermelho; $bold; echo "Este campo não pode ficar vazio!"; $fim
+			exit 1
+		fi
+
+awk -F":" '{print $1}' /etc/passwd > /bin/users.txt
+
+	if grep -Fxq $usuario /bin/users.txt
+    then
+    	$vermelho; $bold; echo -e "\nO usuário $usuario já  existe,  por favor digite um usuário que não exista a seguir.\n"; $branco; $bold
+    	read -p ":: "  usuario
+   
+		if grep -Fxq $usuario /root/users.txt
+        then
+        	$vermelho; $bold; echo -e "\nVocê  digitou um nome de usuário existente duas vezes.\n"
+		exit 2
+    	fi
+	fi
+        
+	echo " "
+	$branco; $bold; read -s -p "Senha[]: " senha
+	
+useradd -M -s /bin/false $usuario && echo $usuario:$senha | chpasswd
+$verde; $bold; echo -e "\nQual a validade do usuário? ($usuario)\n"; $fim
+$branco; $bold; read -p "Digite a quantidade em dias[]: "  dias
+passwd -x $dias $usuario
+
+$branco; $bold; echo -e "\nUsuário $usuario criado\n"
+echo "Deseja Realmente Criar usuário $usuario? [s/n] " 
+read -p ":: " sn
+
+case $sn in
+"s"|"S")
+clear
+echo -e "\nFinalizado, para deletar o usuário:  "
+echo -e "Utilize o comando \033[01;32muserdel $usuario\033[01;37m"
+echo "Ou se houver usuário conectados usando o squid utilize a função deletar: "
+echo -e "Do script executando \033[01;32mmenu\033[01;37m\n"
+
+    $azul; $bold; echo "Usuário: $usuario"
+	echo "Senha: $senha"
+	echo "Expira em $dias dias."; $amarelo; $bold; echo -e "\nPressione qualquer tecla para sair.\n"; $fim
+	read -t15 -n1 qlq
+	
+;;
+
+"n"|"N")
+	clear
+	userdel $usuario
+	clear
+	exit
+;;
+
+*)
+clear
+$vermelho; $bold; echo "Responda apenas s ou n"; $fim
+;;
+esac

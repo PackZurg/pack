@@ -1,0 +1,42 @@
+#!/bin/bash 
+# Autor: @Fs0usa
+# Data de criação/update: 24/04/17
+# Objetivo: por um banner ao logar
+# Descrição: 
+# Projeto: Fechado
+# Utiluze por sua conta e risco, não modifique o script com o intuito
+# de ganhar em cima de tal.
+
+# Tabelas de cores que eu utilizo.
+fim="tput sgr0"
+bold="tput bold"
+vermelho="tput setaf 1"
+verde="tput setaf 2"
+amarelo="tput setaf 3"
+azul="tput setaf 4"
+roxo="tput setaf 5"
+ciano="tput setaf 6"
+branco="tput setaf 7"
+limpa="tput setaf 9"
+# Inicio do script
+clear
+cd /etc/ssh
+$branco; $bold; echo "Qual texto deseja exibir como diálogo?\n"
+read -p ":: " texto
+echo "$texto" > banner.txt
+echo "Banner /etc/ssh/banner.txt" >> sshd_config
+service ssh restart &> /dev/null
+
+echo -e "\nAguarde...\n"
+	apt-get install figlet -y > /dev/null 
+echo -e "Qual o banner que deseja exibir ao logar no terminal?\n"
+
+	read -p ":: " BAN
+	figlet $BAN > /etc/motd
+	clear
+	
+echo -e "Procedimentos completos, para visualizar os resultados desconecte e conecte na sua máquina novamente.\n"; $amarelo; $bold
+echo "Press qualquer tecla para sair."; $fim
+read -n1 qlq
+clear
+exit

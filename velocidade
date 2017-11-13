@@ -1,0 +1,53 @@
+#!/bin/bash 
+# Autor: @Fs0usa
+# Data de criação:     /  /  /
+# Objetivo:
+# Descrição: 
+# Projeto: Fechado
+# Utiluze por sua conta e risco, não modifique o script com o intuito
+# de ganhar em cima de tal.
+
+# Tabelas de cores que eu utilizo.
+fim="tput sgr0"
+bold="tput bold"
+ciano="\e[1;36m"
+branco="\e[1;37m"
+vermelho="\e[1;31m" 
+amarelo="\e[1;33m"
+azul="\e[1;34m"
+verde="\e[1;32m"
+# Inicio do script
+
+clear
+$bold 
+echo -e "$amarelo
+Aguarde..."
+apt-get install python -y 1> /dev/null
+apt-get install python-pip -y 1> /dev/null 
+pip install speedtest-cli 1> /dev/null 
+$bold
+echo -e "$verde
+Calculando a velocidade interna de sua VPS"
+
+VELO=$(speedtest --share > /bin/log.velocidade.db)
+PING1=`cat /bin/log.velocidade.db | grep Hosted`
+UPLOAD1=`cat /bin/log.velocidade.db | grep Upload`
+DOWNLOAD1=`cat /bin/log.velocidade.db | grep Download`
+LINK=`cat /bin/log.velocidade.db | grep Share`
+LINK1=`echo ${LINK#Share results: }`
+TESTING1=`cat /bin/log.velocidade.db | grep Testing`
+FROM1=`echo ${TESTING1#Testing from }`
+FROM2=`echo ${FROM1%%(*}`
+$bold
+echo -e "
+$ciano You $verde$DOWNLOAD1
+$ciano You $verde$UPLOAD1
+$ciano You Host & Ping: $verde$PING1
+$ciano From: $verde$FROM2
+$branco Share this result: $LINK1
+"
+$bold
+echo -e "
+$amarelo Pressione qualquer tecla para sair" 
+$fim
+read -n1 qlqTcla

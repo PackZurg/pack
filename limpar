@@ -1,0 +1,56 @@
+#!/bin/bash
+# BY https://telegram.me/Fs0usa
+# Version 1.0
+# limpar à  memória
+clear
+echo -e "\033[1;32mAguarde um pouco...\033[01;37m"
+apt-get autoclean -y 1> /dev/null 2> /dev/stdout
+apt-get clean -y 1> /dev/null 2> /dev/stdout
+apt-get install autoremove -y 1> /dev/null 2> /dev/stdout
+apt-get install deborphan -y 1> /dev/null 2> /dev/stdout
+clear
+echo " "
+tput setaf 6 ; tput bold ;
+echo "
+                         Removendo Pacotes Órfãs" ; tput sgr0
+sleep 2
+apt-get remove $(deborphan) -y 1> /dev/null
+echo " "
+tput setaf 2 ; tput bold ;
+echo "Calculando a memória atual..." ; tput sgr0
+echo " "
+sleep 4
+echo "-----------------------------------------------------------"
+dmidecode -t 19 | grep Range > teste.txt
+cat teste.txt
+rm -rf teste.txt
+ echo "-----------------------------------------------------------"
+ 
+echo " "
+MEM1=`free|awk '/Mem:/ {print int(100*$3/$2)}'`
+free -m
+ 
+echo "---------------------------------------------------------"
+echo  "Memória RAM Usada antes de fazer a limpeza: $MEM1%"
+echo "---------------------------------------------------------"
+sleep 3
+echo " "
+echo "LIMPANDO MEMORIA --- RAM ---"
+sync
+echo 3 > /proc/sys/vm/drop_caches
+echo "LIMPANDO MEMORIA SWAP..."
+sleep 4
+swapoff -a
+swapon /dev/sda5
+echo "-----------------------------------------------------------"
+MEM2=`free|awk '/Mem:/ {print int(100*$3/$2)}'`
+free -m
+echo "-----------------------------------------------------------"
+echo "Uso de memória RAM após a limpeza:" $MEM2% "Economia de: " `expr $MEM1 - $MEM2`"%"
+echo "-----------------------------------------------------------"
+echo " "
+tput setaf 3 ; tput bold;
+echo "
+Presione em enter para sair..." ; tput sgr0
+read ent
+exit

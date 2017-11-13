@@ -1,0 +1,123 @@
+#!/bin/bash 
+# Autor: @Fs0usa
+# Data de criação:     /  /  /
+# Objetivo:
+# Descrição: 
+# Projeto: Fechado
+# Utiluze por sua conta e risco, não modifique o script com o intuito
+# de ganhar em cima de tal.
+
+# Tabelas de cores que eu utilizo.
+fim="tput sgr0"
+bold="tput bold"
+vermelho="tput setaf 1"
+verde="tput setaf 2"
+amarelo="tput setaf 3"
+azul="tput setaf 4"
+roxo="tput setaf 5"
+ciano="tput setaf 6"
+branco="tput setaf 7"
+limpa="tput setaf 9"
+# Inicio do script
+nonename=`uname -n`
+clear
+main_vnc()
+{
+$ciano ; $bold ; echo "
+Bem vindo(a) $nonename"
+$branco ; $bold ; echo "
+Deseja realmente fazer isso? [s/n] "
+read -p ":: " sn
+case $sn in
+    s) sim ;;
+    n) nao ;;
+    *) descon ;;
+esac
+}
+
+sim()
+{
+clear
+$verde ; $bold ; echo "
+Instando todos os pacotes necessários, aguarde."
+sleep 1
+apt-get update > /dev/null
+apt-get upgrade -y > /dev/null
+apt-get install xfce4 xfce4-goodies gnome-icon-theme tightvncserver -y > /dev/null
+adduser vnc 
+echo vnc:$senha | chpasswd
+addgroup vnc sudo
+clear
+$ciano ; $bold ; echo "
+Digite uma senha a seguir"
+vncserver
+IP=$(wget -qO- ipv4.icanhazip.com)
+clear
+$amarelo ; $bold ; echo "
+Tudo pronto, utilize seu Ip + a porta 5901
+
+Exemplo: $IP:1
+E utilize a senha que você colocou no processo. " ; $fim
+exit
+}
+
+nao()
+{
+clear
+$fim
+exit
+}
+
+failed()
+{
+clear
+$vermelho ; $bold ; echo "
+Este script é especialmente feito para máquinas com a distro Debian 8
+não será possivel continuar." ; $fim
+exit
+}
+
+descon()
+{
+clear
+$vermelho ; $bold
+echo "Responda apenas s ou n"
+$fim
+main_vnc
+}
+
+# verifica se a maquina é ubuntu 16
+main_verifi()
+{
+Sis1=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep DISTRIB_DESCRIPTION`
+Sis2=`echo ${Sis1#DISTRIB_DESCRIPTION=}`
+Sis3=`echo ${Sis2%%.*} | sed 's/"//'`
+
+sisop=""
+
+if [ "$Sis3" = "Debian 7" ]
+then
+    sisop="1"
+fi
+if [ "$Sis3" = "Ubuntu 14" ]
+then
+    sisop="2"
+fi
+if [ "$Sis3" = "Ubuntu 16" ]
+then
+    sisop="3"
+fi
+if [ -z "$Sis1" ]; then
+   Sis1=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep PRETTY_NAME=`
+   Sis2=`echo ${Sis1#PRETTY_NAME=}`
+   Sis3=`echo $Sis3 | sed 's/"//' | awk '{print $1}'`
+   sisop="1"
+fi
+if [ "$sisop" = "1" ];
+then
+main_vnc
+else
+failed
+fi
+}
+main_verifi
