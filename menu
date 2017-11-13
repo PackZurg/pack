@@ -1,0 +1,73 @@
+#!/bin/bash
+# Autor: @Fs0usa
+# Data de criação: 12/04/17
+# Objetivo:
+# Descrição: 
+# Projeto: Fechado
+# Utiluze por sua conta e risco, não modifique o script com o intuito
+# de ganhar em cima de tal.
+
+# Tabelas de cores que eu utilizo.
+ciano="\e[1;36m"
+branco="\e[1;37m"
+vermelho="\e[1;31m" 
+amarelo="\e[1;33m"
+azul="\e[1;34m"
+verde="\e[1;32m"
+neg="\e[0m"
+# Inicio do script
+clear
+main() {
+hostname=`uname -n`
+echo -e "$branco
+Seja bem vindo(a) $hostname.
+Escolha uma opção, você também pode chamar ela apenas digitando o nome do script. (No seu Shell)
+Aqui estão os comandos disponíveis: [0] = Sair
+
+$branco [01]-[adchost   ]$amarelo Libera a conexão ao um host ou ip do proxy squid.
+$branco [02]-[atualizar ]$amarelo Atualiza este script, trazendo possiveis atualizações.
+$branco [03]-[adicionar ]$amarelo Adiciona usuários sem acesso ao shell.
+$branco [04]-[apagar    ]$amarelo Apaga este conjunto de scripts.
+$branco [05]-[banner    ]$amarelo Adiciona um banner no seu terminal e em outros logs.
+$branco [06]-[conectados]$amarelo Mostra uma tabela com usuários e suas conexoes ativas.
+$branco [07]-[configurar]$amarelo Abre as portas para conexão (ssh/squid).
+$branco [08]-[criar     ]$amarelo Cria um usuário comum, perfeito pra quem usa dropbear.
+$branco [09]-[deletar   ]$amarelo Deleta um usuário existente na máquina.
+$branco [10]-[delimitado]$amarelo Seta o número de conexões simultâneas.
+$branco [11]-[drop      ]$amarelo Instala e configura o serviço dropbear.
+$branco [12]-[limitador ]$amarelo Aplica limite de conexões simultâneas.
+$branco [13]-[limpar    ]$amarelo Limpa a memória da máquina.
+$branco [14]-[monitor   ]$amarelo Mostra o número de conexões eno limite aplicado.
+$branco [15]-[velocidade]$amarelo Mostra a velocidade atual da rede (speedtest).
+$branco [16]-[vncdeb    ]$amarelo Instala o VNC no Debian.
+$branco [17]-[vnc16     ]$amarelo Instala o VNC no Ubuntu 16. $ciano
+                                                                 By: @Fs0usa $neg"
+
+read -p ": " opc
+case $opc in
+"00" | "0" | "exit") exit ;;
+"01" | "1" | "adchost") adchost ;;
+"02" | "2" | "atualizar") atualizar ;;
+"03" | "3" | "adicionar") adicionar ;;
+"04" | "4" | "apagar") apagar ;;
+"05" | "5" | "banner") banner ;;
+"06" | "6" | "conectados") conectados ;;
+"07" | "7" | "configurar") configurar ;;
+"08" | "8" | "criar") criar ;;
+"09" | "9" | "deletar") deletar ;;
+"10" | "10" | "delimitador") delimitador ;;
+"11" | "drop") apt-get install dos2unix >/dev/null && wget -O- https://raw.githubusercontent.com/Fs0usa/drop/master/drop > /bin/drop && chmod +x /bin/drop && dos2unix /bin/drop && bash /bin/drop ;;
+"12" | "limitador") limitador ;;
+"13" | "limpar") limpar ;;
+"14" | "monitor") monitor ;;
+"15" | "velocidade") velocidade ;;
+"16" | "vncdeb") vncdeb ;;
+"17" | "vnc16") vnc16 ;;
+*)
+clear
+echo -e "$vermelho Função inexistente. $neg"
+main
+;;
+esac
+}
+main
